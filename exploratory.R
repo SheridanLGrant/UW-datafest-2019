@@ -20,14 +20,14 @@ data_raw_str <- 'USCensus1990raw.data.txt'
 
 ## Read with readr
 t1 <- Sys.time()
-if (!exists(data_str)) {
+if (!exists(census)) {
   census <- str_c(repo_url, data_str) %>% read_csv()
 }
 t2 <- Sys.time()
 cat('Prepared data read time with readr:', t2-t1, 'mins')
 
 t3 <- Sys.time()
-if (!exists(data_str)) {
+if (!exists(census_raw)) {
   census_raw <- str_c(repo_url, data_raw_str) %>% read_tsv()  # lol good luck
 }
 t4 <- Sys.time()
@@ -41,7 +41,7 @@ census_raw_file <- file(str_c(repo_url, data_raw_str), open = 'r')
 p <- length(str_split(readLines(census_raw_file, n = 1), '\t')[[1]])
 close(census_raw_file)
 census_raw_file <- file(str_c(repo_url, data_raw_str), open = 'r')
-n_samp <- floor(n/1000)
+n_samp <- floor(n/100)  # What is a reasonable figure here? Why?
 census_raw <- matrix(nrow = n_samp, ncol = p)
 ind_samp <- sample(n, n_samp)
 i <- 1
@@ -61,9 +61,9 @@ write_csv(census_raw, 'C:/Users/Sheridongle/Desktop/census_raw.csv')
 
 # Data.table, fread, sorting
 t7 <- Sys.time()
-census <- fread(str_c(repo_url, data_str))
+census_dt <- fread(str_c(repo_url, data_str))
 t8 <- Sys.time()
-cat('Prepared data read time with data.table:', t8-t7, 'seconds')
+cat('Prepared data read time with data.table:', t8-t7, 'seconds')  # WOW, right?
 
 
 # Wide-to-long format
@@ -110,7 +110,7 @@ job_data_long %>%
 job_data_long %>% 
   group_by(candidate_id) %>%
   summarize(avg_score = mean(score)) %>%
-  pull(avg_score) %>% qqnorm()  # pull gets the vector
+  pull(avg_score) %>% qqnorm()  # pull gets the vector, so this one doesn't crash
 
 (job_data_long %>% 
   group_by(candidate_id) %>%
@@ -119,7 +119,7 @@ job_data_long %>%
 
 job_data_long %>%
   group_by(candidate_id) %>%
-  count(score)  # grouping hurt!
+  count(score)  # rouping hurt! 
 
 ## Refactoring
 job_data_long$score <- as_factor(job_data_long$score)  # tidyverse not always great
